@@ -4,6 +4,25 @@ This GitHub Action allows you to run [Claude Code](https://www.anthropic.com/cla
 
 For simply tagging @claude in issues and PRs out of the box, [check out the Claude Code action and GitHub app](https://github.com/anthropics/claude-code-action).
 
+## Azure DevOps Extension
+
+This action is also available as an Azure DevOps extension. The extension provides the same Claude Code functionality for Azure DevOps pipelines.
+
+**Installation:**
+1. Install the extension from the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items?itemName=claswen.claude-code-base-task)
+2. Use the task in your Azure DevOps pipelines
+
+**Usage in Azure DevOps:**
+```yaml
+- task: ClaudeCodeBaseTask@1
+  inputs:
+    prompt: 'Your prompt here'
+    anthropic_api_key: '$(ANTHROPIC_API_KEY)'
+    allowed_tools: 'Bash(git:*),View,GlobTool,GrepTool,BatchTool'
+```
+
+For detailed Azure DevOps documentation, see [README-azure.md](./README-azure.md).
+
 ## Usage
 
 Add the following to your workflow file:
