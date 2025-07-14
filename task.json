@@ -1,0 +1,182 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+  "id": "c6c9905c-dc54-462c-820c-c7e0cf8f824d",
+  "name": "ClaudeCodeBaseTask",
+  "friendlyName": "Claude Code Base Task",
+  "description": "Run Claude Code in Azure DevOps pipelines",
+  "helpMarkDown": "Run Claude Code AI assistant in Azure DevOps pipelines for automated code analysis, issue triage, and development tasks.",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "author": "Anthropic",
+  "version": {
+    "Major": 1,
+    "Minor": 0,
+    "Patch": 6
+  },
+  "minimumAgentVersion": "2.144.0",
+  "instanceNameFormat": "Claude Code: $(prompt)",
+  "inputs": [
+    {
+      "name": "prompt",
+      "type": "multiLine",
+      "label": "Prompt",
+      "required": false,
+      "helpMarkDown": "The prompt to send to Claude Code (mutually exclusive with prompt_file)"
+    },
+    {
+      "name": "prompt_file",
+      "type": "string",
+      "label": "Prompt File",
+      "required": false,
+      "helpMarkDown": "Path to a file containing the prompt to send to Claude Code (mutually exclusive with prompt)"
+    },
+    {
+      "name": "allowed_tools",
+      "type": "string",
+      "label": "Allowed Tools",
+      "required": false,
+      "helpMarkDown": "Comma-separated list of allowed tools for Claude Code to use"
+    },
+    {
+      "name": "disallowed_tools",
+      "type": "string",
+      "label": "Disallowed Tools",
+      "required": false,
+      "helpMarkDown": "Comma-separated list of disallowed tools that Claude Code cannot use"
+    },
+    {
+      "name": "max_turns",
+      "type": "string",
+      "label": "Max Turns",
+      "required": false,
+      "helpMarkDown": "Maximum number of conversation turns (default: no limit)"
+    },
+    {
+      "name": "mcp_config",
+      "type": "string",
+      "label": "MCP Configuration",
+      "required": false,
+      "helpMarkDown": "MCP configuration as JSON string or path to MCP configuration JSON file"
+    },
+    {
+      "name": "system_prompt",
+      "type": "multiLine",
+      "label": "System Prompt",
+      "required": false,
+      "helpMarkDown": "Override system prompt"
+    },
+    {
+      "name": "append_system_prompt",
+      "type": "multiLine",
+      "label": "Append System Prompt",
+      "required": false,
+      "helpMarkDown": "Append to system prompt"
+    },
+    {
+      "name": "model",
+      "type": "string",
+      "label": "Model",
+      "required": false,
+      "helpMarkDown": "Model to use (provider-specific format required for Bedrock/Vertex)"
+    },
+    {
+      "name": "fallback_model",
+      "type": "string",
+      "label": "Fallback Model",
+      "required": false,
+      "helpMarkDown": "Enable automatic fallback to specified model when default model is unavailable"
+    },
+    {
+      "name": "claude_env",
+      "type": "multiLine",
+      "label": "Claude Environment Variables",
+      "required": false,
+      "helpMarkDown": "Custom environment variables to pass to Claude Code execution (YAML multiline format)"
+    },
+    {
+      "name": "timeout_minutes",
+      "type": "string",
+      "label": "Timeout Minutes",
+      "required": false,
+      "defaultValue": "10",
+      "helpMarkDown": "Timeout in minutes for Claude Code execution"
+    },
+    {
+      "name": "anthropic_api_key",
+      "type": "string",
+      "label": "Anthropic API Key",
+      "required": false,
+      "helpMarkDown": "Anthropic API key (required for direct Anthropic API)"
+    },
+    {
+      "name": "claude_code_oauth_token",
+      "type": "string",
+      "label": "Claude Code OAuth Token",
+      "required": false,
+      "helpMarkDown": "Claude Code OAuth token (alternative to anthropic_api_key)"
+    },
+    {
+      "name": "use_bedrock",
+      "type": "boolean",
+      "label": "Use AWS Bedrock",
+      "required": false,
+      "defaultValue": false,
+      "helpMarkDown": "Use Amazon Bedrock with service connection authentication instead of direct Anthropic API"
+    },
+    {
+      "name": "use_vertex",
+      "type": "boolean",
+      "label": "Use Google Vertex AI",
+      "required": false,
+      "defaultValue": false,
+      "helpMarkDown": "Use Google Vertex AI with service connection authentication instead of direct Anthropic API"
+    },
+    {
+      "name": "aws_region",
+      "type": "string",
+      "label": "AWS Region",
+      "required": false,
+      "helpMarkDown": "AWS region for Bedrock (required when use_bedrock is true)"
+    },
+    {
+      "name": "gcp_project_id",
+      "type": "string",
+      "label": "GCP Project ID",
+      "required": false,
+      "helpMarkDown": "Google Cloud project ID for Vertex AI (required when use_vertex is true)"
+    },
+    {
+      "name": "gcp_region",
+      "type": "string",
+      "label": "GCP Region",
+      "required": false,
+      "helpMarkDown": "Google Cloud region for Vertex AI (required when use_vertex is true)"
+    },
+    {
+      "name": "use_node_cache",
+      "type": "boolean",
+      "label": "Use Node.js Cache",
+      "required": false,
+      "defaultValue": false,
+      "helpMarkDown": "Whether to use Node.js dependency caching (set to true only for Node.js projects with lock files)"
+    }
+  ],
+  "outputVariables": [
+    {
+      "name": "conclusion",
+      "description": "Execution status of Claude Code ('success' or 'failure')"
+    },
+    {
+      "name": "execution_file",
+      "description": "Path to the JSON file containing Claude Code execution log"
+    }
+  ],
+  "execution": {
+    "Node20_1": {
+      "target": "azure-pipeline.js"
+    }
+  }
+}

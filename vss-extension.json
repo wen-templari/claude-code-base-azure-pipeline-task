@@ -1,0 +1,56 @@
+{
+  "manifestVersion": 1,
+  "id": "claude-code-base-task",
+  "name": "Claude Code Base Task",
+  "version": "1.0.6",
+  "publisher": "claswen",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "description": "Run Claude Code AI assistant in Azure DevOps pipelines for automated code analysis, issue triage, and development tasks",
+  "categories": [
+    "Azure Pipelines"
+  ],
+  "tags": [
+    "AI",
+    "Claude",
+    "Code Analysis",
+    "Automation",
+    "CI/CD"
+  ],
+  "files": [
+    {
+      "path": "dist",
+      "addressable": true
+    },
+    {
+      "path": "README-azure.md"
+    },
+    {
+      "path": "azure-pipelines.yml"
+    }
+  ],
+  "contributions": [
+    {
+      "id": "claude-code-base-task",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "dist"
+      }
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "uri": "https://github.com/anthropics/claude-code-base-action"
+  },
+  "branding": {
+    "color": "orange",
+    "theme": "light"
+  },
+  "public": true
+}

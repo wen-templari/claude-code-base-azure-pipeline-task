@@ -1,16 +1,19 @@
 {
   "name": "@anthropic-ai/claude-code-base-action",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "private": true,
   "scripts": {
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "install-hooks": "bun run scripts/install-hooks.sh",
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:azure": "tsc src/azure-pipeline.ts --outDir dist --target es2020 --module commonjs --moduleResolution node",
+    "package:azure": "npm run build:azure && cp task.json dist/ && cd dist && npm install azure-pipelines-task-lib --production"
   },
   "dependencies": {
-    "@actions/core": "^1.10.1"
+    "@actions/core": "^1.10.1",
+    "azure-pipelines-task-lib": "^4.17.0"
   },
   "devDependencies": {
     "@types/bun": "^1.2.12",

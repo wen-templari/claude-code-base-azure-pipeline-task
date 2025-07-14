@@ -1,0 +1,238 @@
+# Azure DevOps Pipeline example for Claude Code Base Task
+# This pipeline demonstrates how to use the Claude Code Base Task in Azure DevOps
+
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  # Configure these variables in your Azure DevOps project
+  # For security, use Azure Key Vault or secure variables
+  ANTHROPIC_API_KEY: $(anthropic-api-key)  # Configure as secret variable
+  
+  # For AWS Bedrock (optional)
+  AWS_ACCESS_KEY_ID: $(aws-access-key-id)
+  AWS_SECRET_ACCESS_KEY: $(aws-secret-access-key)
+  
+  # For Google Vertex AI (optional)
+  GOOGLE_APPLICATION_CREDENTIALS: $(google-application-credentials)
+
+stages:
+  - stage: Claude_Code_Analysis
+    displayName: 'Claude Code Analysis'
+    jobs:
+      - job: Issue_Triage
+        displayName: 'Issue Triage with Claude'
+        steps:
+          - checkout: self
+            fetchDepth: 0
+            displayName: 'Checkout repository'
+
+          - task: NodeTool@0
+            displayName: 'Install Node.js'
+            inputs:
+              versionSpec: '20.x'
+
+          - script: |
+              # Install dependencies for the Claude Code task
+              npm install -g @anthropic-ai/claude-code@1.0.51
+              npm install
+            displayName: 'Install dependencies'
+
+          - script: |
+              # Create MCP configuration for GitHub integration
+              mkdir -p $(Agent.TempDirectory)/mcp-config
+              cat > $(Agent.TempDirectory)/mcp-config/mcp-servers.json << 'EOF'
+              {
+                "mcpServers": {
+                  "github": {
+                    "command": "docker",
+                    "args": [
+                      "run",
+                      "-i",
+                      "--rm",
+                      "-e",
+                      "GITHUB_TOKEN",
+                      "ghcr.io/github/github-mcp-server:sha-7aced2b"
+                    ],
+                    "env": {
+                      "GITHUB_TOKEN": "$(System.AccessToken)"
+                    }
+                  }
+                }
+              }
+              EOF
+            displayName: 'Setup MCP Configuration'
+
+          - script: |
+              # Create a comprehensive code analysis prompt
+              mkdir -p $(Agent.TempDirectory)/claude-prompts
+              cat > $(Agent.TempDirectory)/claude-prompts/analysis-prompt.txt << 'EOF'
+              You are a senior software engineer reviewing this codebase. Please perform a comprehensive analysis covering:
+
+              1. **Code Quality Assessment**
+                 - Review code structure and organization
+                 - Identify potential bugs or security vulnerabilities
+                 - Check for code smells and anti-patterns
+                 - Assess adherence to best practices
+
+              2. **Architecture Review**
+                 - Analyze the overall architecture and design patterns
+                 - Identify potential scalability issues
+                 - Review dependency management
+                 - Suggest architectural improvements
+
+              3. **Documentation Review**
+                 - Check if code is well-documented
+                 - Review README files and technical documentation
+                 - Identify missing documentation
+
+              4. **Testing Coverage**
+                 - Review existing tests
+                 - Identify areas that need more testing
+                 - Suggest test improvements
+
+              5. **Performance Analysis**
+                 - Identify potential performance bottlenecks
+                 - Review resource usage patterns
+                 - Suggest optimization opportunities
+
+              Please provide specific, actionable recommendations for each area.
+              EOF
+            displayName: 'Create Analysis Prompt'
+
+          - task: ClaudeCodeBaseTask@1
+            displayName: 'Run Claude Code Analysis'
+            inputs:
+              prompt_file: '$(Agent.TempDirectory)/claude-prompts/analysis-prompt.txt'
+              allowed_tools: 'Bash,Glob,Grep,Read,LS,WebFetch'
+              timeout_minutes: '15'
+              anthropic_api_key: '$(ANTHROPIC_API_KEY)'
+              max_turns: '10'
+
+          - publish: '$(Agent.TempDirectory)/claude-execution-output.json'
+            artifact: 'claude-analysis-results'
+            displayName: 'Publish Analysis Results'
+
+      - job: Security_Review
+        displayName: 'Security Review with Claude'
+        dependsOn: Issue_Triage
+        steps:
+          - checkout: self
+            fetchDepth: 0
+
+          - task: NodeTool@0
+            displayName: 'Install Node.js'
+            inputs:
+              versionSpec: '18.x'
+
+          - script: |
+              npm install -g @anthropic-ai/claude-code@1.0.51
+              npm install
+            displayName: 'Install dependencies'
+
+          - task: ClaudeCodeBaseTask@1
+            displayName: 'Security Analysis'
+            inputs:
+              prompt: |
+                Please perform a security review of this codebase:
+                
+                1. Look for common security vulnerabilities (OWASP Top 10)
+                2. Check for secrets or sensitive data in the code
+                3. Review authentication and authorization mechanisms
+                4. Identify potential injection vulnerabilities
+                5. Check for insecure dependencies
+                6. Review input validation and sanitization
+                
+                Provide specific recommendations for each finding.
+              allowed_tools: 'Bash,Glob,Grep,Read,LS'
+              disallowed_tools: 'Edit,Write,MultiEdit'
+              timeout_minutes: '10'
+              anthropic_api_key: '$(ANTHROPIC_API_KEY)'
+              system_prompt: 'You are a security expert focused on identifying and preventing security vulnerabilities.'
+
+          - publish: '$(Agent.TempDirectory)/claude-execution-output.json'
+            artifact: 'claude-security-results'
+            displayName: 'Publish Security Results'
+
+      - job: Bedrock_Example
+        displayName: 'Claude via AWS Bedrock'
+        condition: eq(variables['USE_BEDROCK'], 'true')
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: 'Install Node.js'
+            inputs:
+              versionSpec: '18.x'
+
+          - script: |
+              npm install -g @anthropic-ai/claude-code@1.0.51
+              npm install
+            displayName: 'Install dependencies'
+
+          - task: ClaudeCodeBaseTask@1
+            displayName: 'Claude via Bedrock'
+            inputs:
+              prompt: 'Analyze this codebase and provide suggestions for improvement.'
+              use_bedrock: true
+              aws_region: 'us-east-1'
+              model: 'anthropic.claude-3-sonnet-20240229-v1:0'
+              timeout_minutes: '10'
+              allowed_tools: 'Bash,Glob,Grep,Read,LS'
+
+      - job: Vertex_Example
+        displayName: 'Claude via Google Vertex AI'
+        condition: eq(variables['USE_VERTEX'], 'true')
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: 'Install Node.js'
+            inputs:
+              versionSpec: '18.x'
+
+          - script: |
+              npm install -g @anthropic-ai/claude-code@1.0.51
+              npm install
+            displayName: 'Install dependencies'
+
+          - task: ClaudeCodeBaseTask@1
+            displayName: 'Claude via Vertex AI'
+            inputs:
+              prompt: 'Review this codebase for potential improvements and best practices.'
+              use_vertex: true
+              gcp_project_id: 'my-gcp-project'
+              gcp_region: 'us-central1'
+              model: 'claude-3-sonnet@20240229'
+              timeout_minutes: '10'
+              allowed_tools: 'Bash,Glob,Grep,Read,LS'
+
+  - stage: Deploy_Task
+    displayName: 'Deploy Claude Code Task'
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - job: Package_Task
+        displayName: 'Package and Deploy Task'
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: 'Install Node.js'
+            inputs:
+              versionSpec: '18.x'
+
+          - script: |
+              npm install
+              npm run build:azure
+              npm run package:azure
+            displayName: 'Build and Package Task'
+
+          - publish: 'dist/'
+            artifact: 'claude-code-task'
+            displayName: 'Publish Task Artifact'
