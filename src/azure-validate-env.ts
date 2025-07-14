@@ -34,7 +34,7 @@ export function validateEnvironmentVariablesAzure() {
     // Check for AWS credentials in Azure DevOps variables or service connections
     const awsAccessKeyId = tl.getVariable("AWS_ACCESS_KEY_ID");
     const awsSecretAccessKey = tl.getVariable("AWS_SECRET_ACCESS_KEY");
-    
+
     if (!awsAccessKeyId || !awsSecretAccessKey) {
       errors.push(
         "AWS credentials (AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY) must be configured as pipeline variables when using AWS Bedrock.",
@@ -45,14 +45,20 @@ export function validateEnvironmentVariablesAzure() {
     const gcpRegion = tl.getInput("gcp_region", false);
 
     if (!gcpProjectId) {
-      errors.push("'gcp_project_id' input is required when using Google Vertex AI.");
+      errors.push(
+        "'gcp_project_id' input is required when using Google Vertex AI.",
+      );
     }
     if (!gcpRegion) {
-      errors.push("'gcp_region' input is required when using Google Vertex AI.");
+      errors.push(
+        "'gcp_region' input is required when using Google Vertex AI.",
+      );
     }
 
     // Check for GCP credentials
-    const googleApplicationCredentials = tl.getVariable("GOOGLE_APPLICATION_CREDENTIALS");
+    const googleApplicationCredentials = tl.getVariable(
+      "GOOGLE_APPLICATION_CREDENTIALS",
+    );
     if (!googleApplicationCredentials) {
       errors.push(
         "GOOGLE_APPLICATION_CREDENTIALS must be configured as a pipeline variable when using Google Vertex AI.",
@@ -65,9 +71,7 @@ export function validateEnvironmentVariablesAzure() {
   const promptFile = tl.getInput("prompt_file", false);
 
   if (!prompt && !promptFile) {
-    errors.push(
-      "Either 'prompt' or 'prompt_file' input is required.",
-    );
+    errors.push("Either 'prompt' or 'prompt_file' input is required.");
   }
 
   if (prompt && promptFile) {

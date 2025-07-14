@@ -1,0 +1,129 @@
+name: Bump Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: "Version bump type"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      azure_version:
+        description: "Azure extension version (e.g., 1.0.7)"
+        required: false
+        type: string
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Bump GitHub Action version
+        id: version
+        run: |
+          # Get current version
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+
+          # Bump version based on input
+          case "${{ github.event.inputs.version_type }}" in
+            "major")
+              NEW_VERSION=$(npm version major --no-git-tag-version)
+              ;;
+            "minor")
+              NEW_VERSION=$(npm version minor --no-git-tag-version)
+              ;;
+            "patch")
+              NEW_VERSION=$(npm version patch --no-git-tag-version)
+              ;;
+          esac
+
+          # Remove 'v' prefix from npm version output
+          NEW_VERSION=${NEW_VERSION#v}
+          echo "New version: $NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update Azure extension version
+        if: github.event.inputs.azure_version != ''
+        run: |
+          AZURE_VERSION="${{ github.event.inputs.azure_version }}"
+          echo "Updating Azure extension to version: $AZURE_VERSION"
+
+          # Update vss-extension.json
+          sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"$AZURE_VERSION\"/" vss-extension.json
+
+          # Update task.json - extract major, minor, patch from version
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$AZURE_VERSION"
+          sed -i "s/\"Major\": [0-9]*/\"Major\": $MAJOR/" task.json
+          sed -i "s/\"Minor\": [0-9]*/\"Minor\": $MINOR/" task.json
+          sed -i "s/\"Patch\": [0-9]*/\"Patch\": $PATCH/" task.json
+
+          echo "azure_version=$AZURE_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            chore: bump version to ${{ steps.version.outputs.new_version }}${{ github.event.inputs.azure_version != '' && format(' and Azure extension to {0}', github.event.inputs.azure_version) || '' }}
+
+            - Update GitHub Action version to ${{ steps.version.outputs.new_version }}
+            ${{ github.event.inputs.azure_version != '' && format('- Update Azure DevOps extension version to {0}', github.event.inputs.azure_version) || '' }}
+
+            🤖 Generated with [Claude Code](https://claude.ai/code)
+
+            Co-Authored-By: Claude <noreply@anthropic.com>
+          title: "chore: bump version to ${{ steps.version.outputs.new_version }}${{ github.event.inputs.azure_version != '' && format(' and Azure extension to {0}', github.event.inputs.azure_version) || '' }}"
+          body: |
+            ## Version Bump
+
+            - **GitHub Action**: `${{ steps.version.outputs.new_version }}` (${{ github.event.inputs.version_type }} bump)
+            ${{ github.event.inputs.azure_version != '' && format('- **Azure DevOps Extension**: `{0}`', github.event.inputs.azure_version) || '' }}
+
+            ### Changes
+            - Updated `package.json` version
+            ${{ github.event.inputs.azure_version != '' && '- Updated `vss-extension.json` version' || '' }}
+            ${{ github.event.inputs.azure_version != '' && '- Updated `task.json` version components' || '' }}
+
+            ### Testing
+            - [ ] Verify GitHub Action works with new version
+            ${{ github.event.inputs.azure_version != '' && '- [ ] Test Azure DevOps extension build and packaging' || '' }}
+            ${{ github.event.inputs.azure_version != '' && '- [ ] Publish Azure extension to marketplace' || '' }}
+
+            *This PR was automatically created by the bump-version workflow.*
+          branch: bump-version-${{ steps.version.outputs.new_version }}
+          delete-branch: true
+
+      - name: Summary
+        run: |
+          echo "## Version Bump Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **GitHub Action**: ${{ steps.version.outputs.new_version }} (${{ github.event.inputs.version_type }} bump)" >> $GITHUB_STEP_SUMMARY
+          ${{ github.event.inputs.azure_version != '' && 'echo "- **Azure DevOps Extension**: ${{ github.event.inputs.azure_version }}" >> $GITHUB_STEP_SUMMARY' || '' }}
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "A pull request has been created with the version updates." >> $GITHUB_STEP_SUMMARY

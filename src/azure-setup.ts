@@ -47,15 +47,16 @@ export async function setupClaudeCodeSettingsAzure() {
 export async function setupAzureEnvironment() {
   // Setup Azure DevOps specific environment variables
   const agentTempDirectory = tl.getVariable("Agent.TempDirectory") || "/tmp";
-  const agentBuildDirectory = tl.getVariable("Agent.BuildDirectory") || process.cwd();
-  
+  const agentBuildDirectory =
+    tl.getVariable("Agent.BuildDirectory") || process.cwd();
+
   // Set environment variables that Claude Code expects
   process.env.RUNNER_TEMP = agentTempDirectory;
   process.env.CLAUDE_WORKING_DIR = agentBuildDirectory;
-  
+
   console.log(`Azure Agent Temp Directory: ${agentTempDirectory}`);
   console.log(`Azure Agent Build Directory: ${agentBuildDirectory}`);
-  
+
   // Install Claude Code if not already installed
   try {
     await execAsync("claude --version");

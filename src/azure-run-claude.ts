@@ -114,7 +114,10 @@ export function prepareRunConfigAzure(
   };
 }
 
-export async function runClaudeAzure(promptPath: string, options: ClaudeOptionsAzure) {
+export async function runClaudeAzure(
+  promptPath: string,
+  options: ClaudeOptionsAzure,
+) {
   const config = prepareRunConfigAzure(promptPath, options);
 
   // Create a named pipe
@@ -154,10 +157,12 @@ export async function runClaudeAzure(promptPath: string, options: ClaudeOptionsA
     CLAUDE_CODE_ACTION: "1",
     ANTHROPIC_MODEL: tl.getInput("model", false) || "",
     ANTHROPIC_API_KEY: tl.getInput("anthropic_api_key", false) || "",
-    CLAUDE_CODE_OAUTH_TOKEN: tl.getInput("claude_code_oauth_token", false) || "",
+    CLAUDE_CODE_OAUTH_TOKEN:
+      tl.getInput("claude_code_oauth_token", false) || "",
     CLAUDE_CODE_USE_BEDROCK: tl.getBoolInput("use_bedrock", false) ? "1" : "",
     CLAUDE_CODE_USE_VERTEX: tl.getBoolInput("use_vertex", false) ? "1" : "",
-    AWS_REGION: tl.getInput("aws_region", false) || tl.getVariable("AWS_REGION") || "",
+    AWS_REGION:
+      tl.getInput("aws_region", false) || tl.getVariable("AWS_REGION") || "",
     ANTHROPIC_VERTEX_PROJECT_ID: tl.getInput("gcp_project_id", false) || "",
     CLOUD_ML_REGION: tl.getInput("gcp_region", false) || "",
   };
@@ -329,7 +334,10 @@ export async function runClaudeAzure(promptPath: string, options: ClaudeOptionsA
       }
     }
 
-    tl.setResult(tl.TaskResult.Failed, `Claude Code failed with exit code: ${exitCode}`);
+    tl.setResult(
+      tl.TaskResult.Failed,
+      `Claude Code failed with exit code: ${exitCode}`,
+    );
     process.exit(exitCode);
   }
 }

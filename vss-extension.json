@@ -10,16 +10,8 @@
     }
   ],
   "description": "Run Claude Code AI assistant in Azure DevOps pipelines for automated code analysis, issue triage, and development tasks",
-  "categories": [
-    "Azure Pipelines"
-  ],
-  "tags": [
-    "AI",
-    "Claude",
-    "Code Analysis",
-    "Automation",
-    "CI/CD"
-  ],
+  "categories": ["Azure Pipelines"],
+  "tags": ["AI", "Claude", "Code Analysis", "Automation", "CI/CD"],
   "files": [
     {
       "path": "dist",
@@ -36,9 +28,7 @@
     {
       "id": "claude-code-base-task",
       "type": "ms.vss-distributed-task.task",
-      "targets": [
-        "ms.vss-distributed-task.tasks"
-      ],
+      "targets": ["ms.vss-distributed-task.tasks"],
       "properties": {
         "name": "dist"
       }

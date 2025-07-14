@@ -3,7 +3,10 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import { preparePrompt } from "./prepare-prompt";
 import { runClaudeAzure } from "./azure-run-claude";
-import { setupClaudeCodeSettingsAzure, setupAzureEnvironment } from "./azure-setup";
+import {
+  setupClaudeCodeSettingsAzure,
+  setupAzureEnvironment,
+} from "./azure-setup";
 import { validateEnvironmentVariablesAzure } from "./azure-validate-env";
 
 async function run() {
@@ -37,7 +40,10 @@ async function run() {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    tl.setResult(tl.TaskResult.Failed, `Task failed with error: ${errorMessage}`);
+    tl.setResult(
+      tl.TaskResult.Failed,
+      `Task failed with error: ${errorMessage}`,
+    );
     tl.setVariable("conclusion", "failure");
     process.exit(1);
   }

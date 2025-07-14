@@ -6,10 +6,7 @@
   "description": "Run Claude Code in Azure DevOps pipelines",
   "helpMarkDown": "Run Claude Code AI assistant in Azure DevOps pipelines for automated code analysis, issue triage, and development tasks.",
   "category": "Utility",
-  "visibility": [
-    "Build",
-    "Release"
-  ],
+  "visibility": ["Build", "Release"],
   "author": "Anthropic",
   "version": {
     "Major": 1,

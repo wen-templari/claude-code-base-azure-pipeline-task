@@ -1,0 +1,201 @@
+name: Publish Azure Extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish (leave empty to use current version)"
+        required: false
+        type: string
+      dry_run:
+        description: "Dry run (build but do not publish)"
+        required: false
+        default: false
+        type: boolean
+
+  release:
+    types: [published]
+
+jobs:
+  publish-extension:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install tfx-cli
+        run: npm install -g tfx-cli
+
+      - name: Get version info
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+            echo "Using manual version: $VERSION"
+          else
+            VERSION=$(node -p "require('./vss-extension.json').version")
+            echo "Using current version: $VERSION"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          # Get current versions from files
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          VSS_VERSION=$(node -p "require('./vss-extension.json').version")
+          TASK_VERSION=$(node -p "const task = require('./task.json'); \`\${task.version.Major}.\${task.version.Minor}.\${task.version.Patch}\`")
+
+          echo "package_version=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
+          echo "vss_version=$VSS_VERSION" >> $GITHUB_OUTPUT
+          echo "task_version=$TASK_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Version consistency check
+        run: |
+          echo "🔍 Checking version consistency..."
+          echo "Package.json: ${{ steps.version.outputs.package_version }}"
+          echo "vss-extension.json: ${{ steps.version.outputs.vss_version }}"
+          echo "task.json: ${{ steps.version.outputs.task_version }}"
+
+          if [ "${{ steps.version.outputs.vss_version }}" != "${{ steps.version.outputs.task_version }}" ]; then
+            echo "❌ Version mismatch between vss-extension.json and task.json"
+            exit 1
+          fi
+
+          echo "✅ Version consistency check passed"
+
+      - name: Build Azure extension
+        run: |
+          echo "🔨 Building Azure extension..."
+          npm run package:azure
+
+          echo "📦 Built files:"
+          ls -la dist/
+
+      - name: Validate task configuration
+        run: |
+          echo "🔍 Validating task configuration..."
+
+          # Check if required files exist
+          if [ ! -f "dist/azure-pipeline.js" ]; then
+            echo "❌ Missing azure-pipeline.js"
+            exit 1
+          fi
+
+          if [ ! -f "dist/task.json" ]; then
+            echo "❌ Missing task.json in dist"
+            exit 1
+          fi
+
+          if [ ! -d "dist/node_modules" ]; then
+            echo "❌ Missing node_modules in dist"
+            exit 1
+          fi
+
+          echo "✅ Task configuration validation passed"
+
+      - name: Create VSIX package
+        run: |
+          echo "📦 Creating VSIX package..."
+          tfx extension create --manifest-globs vss-extension.json --output-path ./
+
+          VSIX_FILE="claswen.claude-code-base-task-${{ steps.version.outputs.vss_version }}.vsix"
+
+          if [ ! -f "$VSIX_FILE" ]; then
+            echo "❌ VSIX file not created: $VSIX_FILE"
+            exit 1
+          fi
+
+          echo "✅ VSIX package created: $VSIX_FILE"
+          echo "vsix_file=$VSIX_FILE" >> $GITHUB_OUTPUT
+        id: package
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: azure-extension-${{ steps.version.outputs.vss_version }}
+          path: ${{ steps.package.outputs.vsix_file }}
+          retention-days: 30
+
+      - name: Publish to Azure DevOps Marketplace
+        if: github.event.inputs.dry_run != 'true'
+        env:
+          AZURE_DEVOPS_EXT_PAT: ${{ secrets.AZURE_DEVOPS_EXT_PAT }}
+        run: |
+          if [ -z "$AZURE_DEVOPS_EXT_PAT" ]; then
+            echo "❌ AZURE_DEVOPS_EXT_PAT secret not set"
+            echo "Please add your Azure DevOps Personal Access Token as a repository secret"
+            exit 1
+          fi
+
+          echo "🚀 Publishing to Azure DevOps Marketplace..."
+          echo "$AZURE_DEVOPS_EXT_PAT" | tfx extension publish --vsix ${{ steps.package.outputs.vsix_file }} --token stdin
+
+          echo "✅ Extension published successfully!"
+          echo "🌐 View at: https://marketplace.visualstudio.com/items?itemName=claswen.claude-code-base-task"
+
+      - name: Create GitHub Release
+        if: github.event.inputs.dry_run != 'true' && github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: azure-v${{ steps.version.outputs.vss_version }}
+          name: Azure Extension v${{ steps.version.outputs.vss_version }}
+          body: |
+            ## Azure DevOps Extension v${{ steps.version.outputs.vss_version }}
+
+            ### 🚀 Installation
+            Install from the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items?itemName=claswen.claude-code-base-task)
+
+            ### 📦 Package Details
+            - **Extension ID**: claude-code-base-task
+            - **Publisher**: claswen
+            - **Version**: ${{ steps.version.outputs.vss_version }}
+
+            ### 🔧 Usage
+            ```yaml
+            - task: ClaudeCodeBaseTask@1
+              inputs:
+                prompt: 'Your prompt here'
+                anthropic_api_key: '$(ANTHROPIC_API_KEY)'
+                allowed_tools: 'Bash(git:*),View,GlobTool,GrepTool,BatchTool'
+            ```
+
+            ### 📖 Documentation
+            - [Azure DevOps Documentation](./README-azure.md)
+            - [GitHub Action Documentation](./README.md)
+
+            *Published automatically from GitHub Actions*
+          files: ${{ steps.package.outputs.vsix_file }}
+          draft: false
+          prerelease: false
+
+      - name: Summary
+        run: |
+          echo "## 🎉 Azure Extension Publish Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ steps.version.outputs.vss_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **VSIX File**: ${{ steps.package.outputs.vsix_file }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Dry Run**: ${{ github.event.inputs.dry_run }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "🔍 **Dry Run Completed** - Extension was built but not published" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "🚀 **Published Successfully**" >> $GITHUB_STEP_SUMMARY
+            echo "- [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items?itemName=claswen.claude-code-base-task)" >> $GITHUB_STEP_SUMMARY
+            echo "- [GitHub Release](https://github.com/${{ github.repository }}/releases/tag/azure-v${{ steps.version.outputs.vss_version }})" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Test the extension in Azure DevOps" >> $GITHUB_STEP_SUMMARY
+          echo "2. Update documentation if needed" >> $GITHUB_STEP_SUMMARY
+          echo "3. Announce the release" >> $GITHUB_STEP_SUMMARY
