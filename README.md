@@ -14,7 +14,17 @@ This Azure DevOps extension allows you to run [Claude Code](https://www.anthropi
 
 ## Installation
 
+### Option 1: From Azure DevOps Marketplace
+
 Install the extension from the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items?itemName=claswen.claude-code-base-task).
+
+### Option 2: From Source
+
+1. Clone this repository
+2. Install dependencies: `pnpm install`
+3. Build the Azure DevOps task: `pnpm run build:azure`
+4. Package the task: `pnpm run create:vsix`
+5. Upload the task to your Azure DevOps organization
 
 ## Quick Start
 
@@ -377,6 +387,120 @@ See the `azure-pipelines.yml` file for complete pipeline examples including:
 ## License
 
 This project is licensed under the MIT License—see the LICENSE file for details.
+
+## Building and Development
+
+### Prerequisites
+
+- Node.js 18.x or higher
+- pnpm package manager
+- Git (for version management)
+
+### Development Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm install` | Install dependencies |
+| `pnpm run typecheck` | TypeScript type checking |
+| `pnpm run format` | Format code |
+| `pnpm run format:check` | Check code formatting |
+| `pnpm test` | Run tests |
+| `pnpm run build` | Full build with all checks |
+| `pnpm run build:clean` | Clean build (removes dist first) |
+| `pnpm run build:fast` | Fast build (skips tests and lint) |
+| `pnpm run build:azure` | TypeScript compilation only |
+| `pnpm run dev` | Fast build + validation |
+| `pnpm run clean` | Clean all build artifacts |
+
+### Testing
+
+- Test Azure DevOps task locally: `node test-azure-task.js`
+- Test specific file: `pnpm test test/prepare-prompt.test.ts`
+- Requires `ANTHROPIC_API_KEY` environment variable for local testing
+
+### Release Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm run version:bump` | Bump version |
+| `pnpm run create:vsix` | Create VSIX package |
+| `pnpm run publish:extension` | Publish to marketplace |
+| `pnpm run publish:dry-run` | Test publishing without uploading |
+| `pnpm run release` | Full release workflow |
+
+### Build Process
+
+The build process includes:
+
+1. **TypeScript Compilation**: Compiles TypeScript source to JavaScript
+2. **Validation**: Validates the build output
+3. **Dependency Installation**: Installs production dependencies in `dist/`
+4. **File Copying**: Copies necessary files to `dist/`
+
+```bash
+pnpm install
+pnpm run build
+pnpm run create:vsix
+```
+
+### Build Configuration
+
+- **Development**: `tsconfig.json` - Used for development and type checking
+- **Build**: `tsconfig.build.json` - Used for production builds
+
+### Environment Variables
+
+#### Required for Publishing
+
+- `AZURE_DEVOPS_EXT_PAT` - Azure DevOps Personal Access Token
+
+#### Optional
+
+- `NODE_VERSION` - Node.js version for builds (default: 18.x)
+
+### Build Artifacts
+
+The build creates the following structure:
+
+```
+dist/
+├── azure-pipeline.js          # Main entry point
+├── azure-run-claude.js        # Claude execution logic
+├── azure-setup.js            # Setup utilities
+├── azure-validate-env.js     # Environment validation
+├── prepare-prompt.js          # Prompt preparation
+├── setup-claude-code-settings.js # Claude settings
+├── validate-env.js           # Environment validation
+├── task.json                 # Task definition
+├── node_modules/             # Production dependencies
+└── package.json             # Package metadata
+```
+
+### Version Management
+
+```bash
+# Bump patch version (1.0.0 → 1.0.1)
+pnpm run version:bump
+
+# Bump minor version (1.0.0 → 1.1.0)
+pnpm run version:bump minor
+
+# Bump major version (1.0.0 → 2.0.0)
+pnpm run version:bump major
+
+# Update Azure extension too
+pnpm run version:bump -- --auto-azure
+```
+
+### Clean Build
+
+If you encounter issues, try a clean build:
+
+```bash
+pnpm run clean
+pnpm install
+pnpm run build
+```
 
 ## Support
 
