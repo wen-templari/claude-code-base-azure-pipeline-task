@@ -20,7 +20,9 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
-    "noImplicitOverride": true
+    "noImplicitOverride": true,
+    "allowImportingTsExtensions": false,
+    "verbatimModuleSyntax": false
   },
   "include": [
     "src/azure-*.ts",
