@@ -140,7 +140,7 @@ jobs:
           fi
 
           echo "🚀 Publishing to Azure DevOps Marketplace..."
-          echo "$AZURE_DEVOPS_EXT_PAT" | tfx extension publish --vsix ${{ steps.package.outputs.vsix_file }} --token stdin
+          tfx extension publish --vsix ${{ steps.package.outputs.vsix_file }} --token $AZURE_DEVOPS_EXT_PAT
 
           echo "✅ Extension published successfully!"
           echo "🌐 View at: https://marketplace.visualstudio.com/items?itemName=claswen.claude-code-base-task"
