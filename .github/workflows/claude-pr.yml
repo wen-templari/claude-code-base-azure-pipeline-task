@@ -34,5 +34,5 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          allowed_tools: "Bash(bun install),Bash(bun test:*),Bash(bun run format),Bash(bun typecheck)"
-          custom_instructions: "You have also been granted tools for editing files and running bun commands (install, run, test, typecheck) for testing your changes: bun install, bun test, bun run format, bun typecheck."
+          allowed_tools: "Bash(pnpm install),Bash(pnpm test:*),Bash(pnpm run format),Bash(pnpm typecheck)"
+          custom_instructions: "You have also been granted tools for editing files and running pnpm commands (install, run, test, typecheck) for testing your changes: pnpm install, pnpm test, pnpm run format, pnpm typecheck."
