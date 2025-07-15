@@ -1,13 +1,11 @@
-#!/usr/bin/env bun
-
-import { describe, test, expect, beforeEach, afterEach } from "bun:test";
+import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import { preparePrompt, type PreparePromptInput } from "../src/prepare-prompt";
 import { unlink, writeFile, readFile, stat } from "fs/promises";
 
 describe("preparePrompt integration tests", () => {
   beforeEach(async () => {
     try {
-      await unlink("/tmp/claude-action/prompt.txt");
+      await unlink("/tmp/claude-azure-task/prompt.txt");
     } catch {
       // Ignore if file doesn't exist
     }
@@ -15,7 +13,7 @@ describe("preparePrompt integration tests", () => {
 
   afterEach(async () => {
     try {
-      await unlink("/tmp/claude-action/prompt.txt");
+      await unlink("/tmp/claude-azure-task/prompt.txt");
     } catch {
       // Ignore if file doesn't exist
     }
@@ -29,7 +27,7 @@ describe("preparePrompt integration tests", () => {
 
     const config = await preparePrompt(input);
 
-    expect(config.path).toBe("/tmp/claude-action/prompt.txt");
+    expect(config.path).toBe("/tmp/claude-azure-task/prompt.txt");
     expect(config.type).toBe("inline");
 
     const fileContent = await readFile(config.path, "utf-8");

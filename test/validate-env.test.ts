@@ -1,6 +1,4 @@
-#!/usr/bin/env bun
-
-import { describe, test, expect, beforeEach, afterEach } from "bun:test";
+import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import { validateEnvironmentVariables } from "../src/validate-env";
 
 describe("validateEnvironmentVariables", () => {

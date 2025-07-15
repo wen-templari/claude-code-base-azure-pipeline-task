@@ -1,6 +1,4 @@
-#!/usr/bin/env bun
-
-import { describe, test, expect } from "bun:test";
+import { describe, test, expect } from "vitest";
 import { prepareRunConfig, type ClaudeOptions } from "../src/run-claude";
 
 describe("prepareRunConfig", () => {

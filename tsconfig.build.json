@@ -28,11 +28,5 @@
     "src/setup-claude-code-settings.ts",
     "src/validate-env.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "test",
-    "**/*.test.ts",
-    "**/*.spec.ts"
-  ]
+  "exclude": ["node_modules", "dist", "test", "**/*.test.ts", "**/*.spec.ts"]
 }

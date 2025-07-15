@@ -309,11 +309,13 @@ Use provider-specific model names based on your chosen provider:
 ### Common Issues
 
 1. **Authentication Errors**
+
    - Ensure API keys are configured as secret variables
    - Check that service connections are properly configured
    - Verify provider-specific credentials
 
 2. **Timeout Issues**
+
    - Increase `timeout_minutes` for complex tasks
    - Use `max_turns` to limit conversation length
    - Consider breaking complex prompts into smaller tasks
@@ -343,6 +345,7 @@ Enable verbose logging by adding:
 To securely use your Anthropic API key:
 
 1. Add your API key as a secret variable:
+
    - Go to your pipeline's "Variables" section
    - Click "New variable"
    - Name it `ANTHROPIC_API_KEY`
@@ -355,12 +358,14 @@ To securely use your Anthropic API key:
    ```
 
 **Never do this:**
+
 ```yaml
 # ❌ WRONG - Exposes your API key
 anthropic_api_key: "sk-ant-..."
 ```
 
 **Always do this:**
+
 ```yaml
 # ✅ CORRECT - Uses Azure DevOps secret variables
 anthropic_api_key: "$(ANTHROPIC_API_KEY)"
@@ -398,19 +403,19 @@ This project is licensed under the MIT License—see the LICENSE file for detail
 
 ### Development Commands
 
-| Command | Description |
-|---------|-------------|
-| `pnpm install` | Install dependencies |
-| `pnpm run typecheck` | TypeScript type checking |
-| `pnpm run format` | Format code |
-| `pnpm run format:check` | Check code formatting |
-| `pnpm test` | Run tests |
-| `pnpm run build` | Full build with all checks |
-| `pnpm run build:clean` | Clean build (removes dist first) |
-| `pnpm run build:fast` | Fast build (skips tests and lint) |
-| `pnpm run build:azure` | TypeScript compilation only |
-| `pnpm run dev` | Fast build + validation |
-| `pnpm run clean` | Clean all build artifacts |
+| Command                 | Description                       |
+| ----------------------- | --------------------------------- |
+| `pnpm install`          | Install dependencies              |
+| `pnpm run typecheck`    | TypeScript type checking          |
+| `pnpm run format`       | Format code                       |
+| `pnpm run format:check` | Check code formatting             |
+| `pnpm test`             | Run tests                         |
+| `pnpm run build`        | Full build with all checks        |
+| `pnpm run build:clean`  | Clean build (removes dist first)  |
+| `pnpm run build:fast`   | Fast build (skips tests and lint) |
+| `pnpm run build:azure`  | TypeScript compilation only       |
+| `pnpm run dev`          | Fast build + validation           |
+| `pnpm run clean`        | Clean all build artifacts         |
 
 ### Testing
 
@@ -420,13 +425,13 @@ This project is licensed under the MIT License—see the LICENSE file for detail
 
 ### Release Commands
 
-| Command | Description |
-|---------|-------------|
-| `pnpm run version:bump` | Bump version |
-| `pnpm run create:vsix` | Create VSIX package |
-| `pnpm run publish:extension` | Publish to marketplace |
-| `pnpm run publish:dry-run` | Test publishing without uploading |
-| `pnpm run release` | Full release workflow |
+| Command                      | Description                       |
+| ---------------------------- | --------------------------------- |
+| `pnpm run version:bump`      | Bump version                      |
+| `pnpm run create:vsix`       | Create VSIX package               |
+| `pnpm run publish:extension` | Publish to marketplace            |
+| `pnpm run publish:dry-run`   | Test publishing without uploading |
+| `pnpm run release`           | Full release workflow             |
 
 ### Build Process
 

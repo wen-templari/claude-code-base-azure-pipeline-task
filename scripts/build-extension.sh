@@ -108,9 +108,9 @@ fi
 # Install dependencies
 log_step "Installing dependencies..."
 if [ "$VERBOSE" = true ]; then
-    npm install
+    pnpm install
 else
-    npm install --quiet
+    pnpm install --silent
 fi
 log_success "Dependencies installed"
 
@@ -119,16 +119,16 @@ if [ "$SKIP_LINT" = false ]; then
     log_step "Running linting and formatting checks..."
     
     # Check formatting
-    if npm run format:check; then
+    if pnpm run format:check; then
         log_success "Code formatting is correct"
     else
         log_error "Code formatting check failed"
-        log_info "Run 'npm run format' to fix formatting issues"
+        log_info "Run 'pnpm run format' to fix formatting issues"
         exit 1
     fi
     
     # Type checking
-    if npm run typecheck; then
+    if pnpm run typecheck; then
         log_success "TypeScript type checking passed"
     else
         log_error "TypeScript type checking failed"
@@ -141,7 +141,7 @@ fi
 # Run tests
 if [ "$SKIP_TESTS" = false ]; then
     log_step "Running tests..."
-    if npm test; then
+    if pnpm test; then
         log_success "All tests passed"
     else
         log_error "Tests failed"
@@ -181,9 +181,9 @@ fi
 log_step "Installing production dependencies in dist..."
 cd dist
 if [ "$VERBOSE" = true ]; then
-    npm install azure-pipelines-task-lib --production
+    pnpm install azure-pipelines-task-lib --production
 else
-    npm install azure-pipelines-task-lib --production --quiet
+    pnpm install azure-pipelines-task-lib --production --silent
 fi
 cd ..
 log_success "Production dependencies installed in dist"
@@ -269,6 +269,6 @@ fi
 echo "=================================="
 log_success "Azure DevOps Extension build completed successfully!"
 log_info "Next steps:"
-echo "  1. Run tests: npm test"
-echo "  2. Create VSIX: npm run create:vsix"
-echo "  3. Publish: npm run publish:extension"
+echo "  1. Run tests: pnpm test"
+echo "  2. Create VSIX: pnpm run create:vsix"
+echo "  3. Publish: pnpm run publish:extension"

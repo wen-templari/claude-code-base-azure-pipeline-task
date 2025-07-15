@@ -17,10 +17,10 @@
   },
   "content": {
     "details": {
-        "path": "overview.md"
+      "path": "overview.md"
     },
     "license": {
-        "path": "LICENSE"
+      "path": "LICENSE"
     }
   },
   "files": [
