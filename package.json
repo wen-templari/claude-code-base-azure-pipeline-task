@@ -15,17 +15,17 @@
     "build:clean": "./scripts/build-extension.sh --clean",
     "build:fast": "./scripts/build-extension.sh --skip-tests --skip-lint",
     "build:azure": "tsc --project tsconfig.build.json",
-    "package:azure": "npm run build:azure && cp task.json dist/ && cd dist && npm install azure-pipelines-task-lib --production",
+    "package:azure": "npm run build:azure && cp package.json dist/ && cp task.json dist/ && cd dist && npm install azure-pipelines-task-lib --production",
     "clean": "rm -rf dist && rm -rf *.vsix && rm -rf output.txt",
-    "prebuild": "npm run clean",
+    "prebuild": "pnpm run clean",
     "validate:build": "node scripts/validate-build.js",
-    "create:vsix": "npm run build && tfx extension create --manifest-globs vss-extension.json --output-path ./",
+    "create:vsix": "pnpm run build && tfx extension create --manifest-globs vss-extension.json --output-path ./",
     "publish:extension": "./scripts/publish-azure-extension.sh",
     "publish:dry-run": "./scripts/publish-azure-extension.sh --dry-run",
     "version:bump": "./scripts/bump-version.sh",
-    "dev": "npm run build:fast && npm run validate:build",
-    "ci": "npm run build --skip-tests=false --skip-lint=false --verbose",
-    "release": "npm run version:bump && npm run build && npm run create:vsix && npm run publish:extension"
+    "dev": "pnpm run build:fast && pnpm run validate:build",
+    "ci": "pnpm run build --skip-tests=false --skip-lint=false --verbose",
+    "release": "pnpm run version:bump && pnpm run build && pnpm run create:vsix && pnpm run publish:extension"
   },
   "dependencies": {
     "azure-pipelines-task-lib": "^4.17.3"
