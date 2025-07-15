@@ -126,6 +126,8 @@ jobs:
         run: |
           echo "## Version Bump Summary" >> $GITHUB_STEP_SUMMARY
           echo "- **GitHub Action**: ${{ steps.version.outputs.new_version }} (${{ github.event.inputs.version_type }} bump)" >> $GITHUB_STEP_SUMMARY
-          ${{ github.event.inputs.azure_version != '' && 'echo "- **Azure DevOps Extension**: ${{ github.event.inputs.azure_version }}" >> $GITHUB_STEP_SUMMARY' || '' }}
+          if [ "${{ github.event.inputs.azure_version }}" != "" ]; then
+            echo "- **Azure DevOps Extension**: ${{ github.event.inputs.azure_version }}" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "A pull request has been created with the version updates." >> $GITHUB_STEP_SUMMARY
