@@ -29,14 +29,16 @@ jobs:
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
+
+      - uses: pnpm/action-setup@v4
         with:
-          node-version: "18"
+          version: 10
 
       - name: Install dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Install tfx-cli
-        run: npm install -g tfx-cli
+        run: pnpm install -g tfx-cli
 
       - name: Get version info
         id: version
@@ -76,7 +78,7 @@ jobs:
       - name: Build Azure extension
         run: |
           echo "🔨 Building Azure extension..."
-          npm run package:azure
+          pnpm run package:azure
 
           echo "📦 Built files:"
           ls -la dist/
