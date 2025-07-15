@@ -29,10 +29,10 @@
       "addressable": true
     },
     {
-      "path": "README-azure.md"
+      "path": "README.md"
     },
     {
-      "path": "azure-pipelines.yml"
+      "path": "./examples/azure-pipelines.yml"
     }
   ],
   "contributions": [
@@ -47,7 +47,7 @@
   ],
   "repository": {
     "type": "git",
-    "uri": "https://github.com/claswen/claude-code-base-azure-task"
+    "uri": "https://github.com/wen-templari/claude-code-base-azure-pipeline-task"
   },
   "branding": {
     "color": "orange",
