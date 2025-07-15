@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "claude-code-base-task",
   "name": "Claude Code Base Task",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "publisher": "claswen",
   "targets": [
     {
