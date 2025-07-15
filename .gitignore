@@ -1,7 +1,62 @@
-.DS_Store
-node_modules
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
 
-**/.claude/settings.local.json
+# Build artifacts
+dist/
+build/
+*.tsbuildinfo
+*.tgz
 
-dist
+# VSIX packages
 *.vsix
+
+# Temporary files
+*.tmp
+*.temp
+output.txt
+build-report.json
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Cache directories
+.npm/
+.yarn/
+.cache/
+.temp/
+.jest/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+*.log
+logs/
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Backup files
+*.bak
+*.backup
+
+# Claude settings
+**/.claude/settings.local.json

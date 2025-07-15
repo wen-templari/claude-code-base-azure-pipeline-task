@@ -154,7 +154,7 @@ export async function runClaudeAzure(
   const claudeEnv = {
     ...process.env,
     ...config.env,
-    CLAUDE_CODE_ACTION: "1",
+    CLAUDE_CODE_AZURE_TASK: "1",
     ANTHROPIC_MODEL: tl.getInput("model", false) || "",
     ANTHROPIC_API_KEY: tl.getInput("anthropic_api_key", false) || "",
     CLAUDE_CODE_OAUTH_TOKEN:

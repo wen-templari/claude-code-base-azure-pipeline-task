@@ -2,7 +2,7 @@
   "mcpServers": {
     "test-server": {
       "type": "stdio",
-      "command": "bun",
+      "command": "pnpm",
       "args": ["simple-mcp-server.ts"],
       "env": {}
     }

@@ -1,4 +1,4 @@
-import * as core from "@actions/core";
+// GitHub Actions core removed - Azure DevOps extension only
 import { exec } from "child_process";
 import { promisify } from "util";
 import { unlink, writeFile, stat } from "fs/promises";
@@ -7,8 +7,8 @@ import { spawn } from "child_process";
 
 const execAsync = promisify(exec);
 
-const PIPE_PATH = `${process.env.RUNNER_TEMP}/claude_prompt_pipe`;
-const EXECUTION_FILE = `${process.env.RUNNER_TEMP}/claude-execution-output.json`;
+const PIPE_PATH = `/tmp/claude_prompt_pipe`;
+const EXECUTION_FILE = `/tmp/claude-execution-output.json`;
 const BASE_ARGS = ["-p", "--verbose", "--output-format", "stream-json"];
 
 export type ClaudeOptions = {
@@ -221,14 +221,6 @@ export async function runClaude(promptPath: string, options: ClaudeOptions) {
   let timeoutMs = 10 * 60 * 1000; // Default 10 minutes
   if (options.timeoutMinutes) {
     timeoutMs = parseInt(options.timeoutMinutes, 10) * 60 * 1000;
-  } else if (process.env.INPUT_TIMEOUT_MINUTES) {
-    const envTimeout = parseInt(process.env.INPUT_TIMEOUT_MINUTES, 10);
-    if (isNaN(envTimeout) || envTimeout <= 0) {
-      throw new Error(
-        `INPUT_TIMEOUT_MINUTES must be a positive number, got: ${process.env.INPUT_TIMEOUT_MINUTES}`,
-      );
-    }
-    timeoutMs = envTimeout * 60 * 1000;
   }
   const exitCode = await new Promise<number>((resolve) => {
     let resolved = false;
@@ -302,13 +294,13 @@ export async function runClaude(promptPath: string, options: ClaudeOptions) {
 
       console.log(`Log saved to ${EXECUTION_FILE}`);
     } catch (e) {
-      core.warning(`Failed to process output for execution metrics: ${e}`);
+      console.warn(`Failed to process output for execution metrics: ${e}`);
     }
 
-    core.setOutput("conclusion", "success");
-    core.setOutput("execution_file", EXECUTION_FILE);
+    console.log("Claude execution completed successfully");
+    console.log(`Execution file: ${EXECUTION_FILE}`);
   } else {
-    core.setOutput("conclusion", "failure");
+    console.error("Claude execution failed");
 
     // Still try to save execution file if we have output
     if (output) {
@@ -316,7 +308,7 @@ export async function runClaude(promptPath: string, options: ClaudeOptions) {
         await writeFile("output.txt", output);
         const { stdout: jsonOutput } = await execAsync("jq -s '.' output.txt");
         await writeFile(EXECUTION_FILE, jsonOutput);
-        core.setOutput("execution_file", EXECUTION_FILE);
+        console.log(`Execution file saved: ${EXECUTION_FILE}`);
       } catch (e) {
         // Ignore errors when processing output during failure
       }

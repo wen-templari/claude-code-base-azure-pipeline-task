@@ -23,7 +23,7 @@ Thank you for your interest in contributing to Claude Code Base Action! This doc
 2. Install dependencies:
 
    ```bash
-   bun install
+   pnpm install
    ```
 
 3. Set up your Anthropic API key:
@@ -35,10 +35,10 @@ Thank you for your interest in contributing to Claude Code Base Action! This doc
 
 ### Available Scripts
 
-- `bun test` - Run all tests
-- `bun run typecheck` - Type check the code
-- `bun run format` - Format code with Prettier
-- `bun run format:check` - Check code formatting
+- `pnpm test` - Run all tests
+- `pnpm run typecheck` - Type check the code
+- `pnpm run format` - Format code with Prettier
+- `pnpm run format:check` - Check code formatting
 
 ## Testing
 
@@ -47,7 +47,7 @@ Thank you for your interest in contributing to Claude Code Base Action! This doc
 1. **Unit Tests**:
 
    ```bash
-   bun test
+   pnpm test
    ```
 
 2. **Integration Tests** (using GitHub Actions locally):
@@ -82,9 +82,9 @@ Thank you for your interest in contributing to Claude Code Base Action! This doc
 3. Run tests and formatting:
 
    ```bash
-   bun test
-   bun run typecheck
-   bun run format:check
+   pnpm test
+   pnpm run typecheck
+   pnpm run format:check
    ```
 
 4. Push your branch and create a Pull Request:

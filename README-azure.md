@@ -24,7 +24,7 @@ This repository contains the Azure DevOps adaptation of the Claude Code Base Act
 
 ### Option 2: Via Azure DevOps Marketplace
 
-_(Coming soon - task will be published to Azure DevOps Marketplace)_
+Install the extension from the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items?itemName=claswen.claude-code-base-task).
 
 ## Quick Start
 
@@ -283,12 +283,12 @@ See the `azure-pipelines.yml` file for complete pipeline examples including:
 
 ## License
 
-This project is licensed under the same terms as the original Claude Code Base Action.
+This project is licensed under the MIT License—see the LICENSE file for details.
 
 ## Support
 
 For issues and questions:
 
 - Check the [troubleshooting section](#troubleshooting)
-- Review the [original GitHub Action documentation](https://github.com/anthropics/claude-code-base-action)
+- Review the [Azure DevOps documentation](https://docs.microsoft.com/en-us/azure/devops/)
 - Open an issue in this repository

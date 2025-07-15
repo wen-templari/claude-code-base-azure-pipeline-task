@@ -52,7 +52,7 @@ async function validateAndPreparePrompt(
     throw new Error("Prompt is empty. Please provide a non-empty prompt.");
   }
 
-  const inlinePath = "/tmp/claude-action/prompt.txt";
+  const inlinePath = "/tmp/claude-azure-task/prompt.txt";
   return {
     type: "inline",
     path: inlinePath,

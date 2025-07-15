@@ -1,23 +1,35 @@
 {
-  "name": "@anthropic-ai/claude-code-base-action",
+  "name": "@anthropic-ai/claude-code-base-azure-task",
   "version": "1.0.6",
   "private": true,
   "scripts": {
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "install-hooks": "bun run scripts/install-hooks.sh",
-    "test": "bun test",
+    "install-hooks": "pnpm run scripts/install-hooks.sh",
+    "test": "pnpm test",
     "typecheck": "tsc --noEmit",
-    "build:azure": "tsc src/azure-pipeline.ts --outDir dist --target es2020 --module commonjs --moduleResolution node",
-    "package:azure": "npm run build:azure && cp task.json dist/ && cd dist && npm install azure-pipelines-task-lib --production"
+    "build": "./scripts/build-extension.sh",
+    "build:clean": "./scripts/build-extension.sh --clean",
+    "build:fast": "./scripts/build-extension.sh --skip-tests --skip-lint",
+    "build:azure": "tsc --project tsconfig.build.json",
+    "package:azure": "npm run build:azure && cp task.json dist/ && cd dist && npm install azure-pipelines-task-lib --production",
+    "clean": "rm -rf dist && rm -rf *.vsix && rm -rf output.txt",
+    "prebuild": "npm run clean",
+    "validate:build": "node scripts/validate-build.js",
+    "create:vsix": "npm run build && tfx extension create --manifest-globs vss-extension.json --output-path ./",
+    "publish:extension": "./scripts/publish-azure-extension.sh",
+    "publish:dry-run": "./scripts/publish-azure-extension.sh --dry-run",
+    "version:bump": "./scripts/bump-version.sh",
+    "dev": "npm run build:fast && npm run validate:build",
+    "ci": "npm run build --skip-tests=false --skip-lint=false --verbose",
+    "release": "npm run version:bump && npm run build && npm run create:vsix && npm run publish:extension"
   },
   "dependencies": {
-    "@actions/core": "^1.10.1",
-    "azure-pipelines-task-lib": "^4.17.0"
+    "azure-pipelines-task-lib": "^4.17.3"
   },
   "devDependencies": {
     "@types/bun": "^1.2.12",
-    "@types/node": "^20.0.0",
+    "@types/node": "^20.19.7",
     "prettier": "3.5.3",
     "typescript": "^5.8.3"
   }

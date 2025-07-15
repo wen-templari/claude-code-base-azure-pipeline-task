@@ -65,44 +65,28 @@ echo "✅ Version consistency check passed"
 
 # Install dependencies
 echo "📦 Installing dependencies..."
-npm install
+pnpm install
 
 # Check if tfx-cli is installed
 if ! command -v tfx &> /dev/null; then
     echo "📦 Installing tfx-cli..."
-    npm install -g tfx-cli
+    pnpm install -g tfx-cli
 fi
 
 # Build extension
 echo "🔨 Building Azure extension..."
-npm run package:azure
+pnpm run build
 
 echo "📦 Built files:"
 ls -la dist/
 
-# Validate task configuration
-echo "🔍 Validating task configuration..."
-
-if [ ! -f "dist/azure-pipeline.js" ]; then
-    echo "❌ Missing azure-pipeline.js"
-    exit 1
-fi
-
-if [ ! -f "dist/task.json" ]; then
-    echo "❌ Missing task.json in dist"
-    exit 1
-fi
-
-if [ ! -d "dist/node_modules" ]; then
-    echo "❌ Missing node_modules in dist"
-    exit 1
-fi
-
-echo "✅ Task configuration validation passed"
+# Validate build using our comprehensive validator
+echo "🔍 Validating build..."
+pnpm run validate:build
 
 # Create VSIX package
 echo "📦 Creating VSIX package..."
-tfx extension create --manifest-globs vss-extension.json --output-path ./
+pnpm run create:vsix
 
 VSIX_FILE="claswen.claude-code-base-task-$VSS_VERSION.vsix"
 

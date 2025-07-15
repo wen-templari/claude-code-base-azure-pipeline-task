@@ -4,57 +4,60 @@
 
 ### Development Commands
 
-- Build/Type check: `bun run typecheck`
-- Format code: `bun run format`
-- Check formatting: `bun run format:check`
-- Run tests: `bun test`
-- Install dependencies: `bun install`
+- Build/Type check: `pnpm run typecheck`
+- Format code: `pnpm run format`
+- Check formatting: `pnpm run format:check`
+- Run tests: `pnpm test`
+- Install dependencies: `pnpm install`
 
-### Action Testing
+### Azure DevOps Task Testing
 
-- Test action locally: `./test-local.sh`
-- Test specific file: `bun test test/prepare-prompt.test.ts`
+- Test Azure DevOps task locally: `node test-azure-task.js`
+- Test specific file: `pnpm test test/prepare-prompt.test.ts`
 
 ## Architecture Overview
 
-This is a GitHub Action that allows running Claude Code within GitHub workflows. The action consists of:
+This is an Azure DevOps extension that allows running Claude Code within Azure DevOps pipelines. The extension consists of:
 
 ### Core Components
 
-1. **Action Definition** (`action.yml`): Defines inputs, outputs, and the composite action steps
-2. **Prompt Preparation** (`src/index.ts`): Runs Claude Code with specified arguments
+1. **Task Definition** (`task.json`): Defines inputs, outputs, and the Azure DevOps task configuration
+2. **Azure Pipeline Entry** (`src/azure-pipeline.ts`): Main entry point for Azure DevOps task execution
+3. **Prompt Preparation** (`src/prepare-prompt.ts`): Handles prompt input validation and preparation
+4. **Claude Execution** (`src/azure-run-claude.ts`): Manages Claude Code execution with Azure DevOps integration
 
 ### Key Design Patterns
 
 - Uses Bun runtime for development and execution
 - Named pipes for IPC between prompt input and Claude process
 - JSON streaming output format for execution logs
-- Composite action pattern to orchestrate multiple steps
+- Azure DevOps task pattern with proper input/output handling
 - Provider-agnostic design supporting Anthropic API, AWS Bedrock, and Google Vertex AI
 
 ## Provider Authentication
 
 1. **Anthropic API** (default): Requires API key via `anthropic_api_key` input
-2. **AWS Bedrock**: Uses OIDC authentication when `use_bedrock: true`
-3. **Google Vertex AI**: Uses OIDC authentication when `use_vertex: true`
+2. **AWS Bedrock**: Uses AWS credentials from Azure DevOps variables
+3. **Google Vertex AI**: Uses GCP service account credentials from Azure DevOps variables
 
 ## Testing Strategy
 
 ### Local Testing
 
-- Use `act` tool to run GitHub Actions workflows locally
-- `test-local.sh` script automates local testing setup
+- Use `test-azure-task.js` script to test Azure DevOps task locally
 - Requires `ANTHROPIC_API_KEY` environment variable
+- Tests task input validation and Claude execution
 
 ### Test Structure
 
 - Unit tests for configuration logic
 - Integration tests for prompt preparation
-- Full workflow tests in `.github/workflows/test-action.yml`
+- Azure DevOps pipeline tests in `azure-pipelines.yml`
 
 ## Important Technical Details
 
 - Uses `mkfifo` to create named pipes for prompt input
-- Outputs execution logs as JSON to `/tmp/claude-execution-output.json`
-- Timeout enforcement via `timeout` command wrapper
+- Outputs execution logs as JSON to `${Agent.TempDirectory}/claude-execution-output.json`
+- Timeout enforcement via process management
 - Strict TypeScript configuration with Bun-specific settings
+- Azure DevOps task library integration for proper variable handling

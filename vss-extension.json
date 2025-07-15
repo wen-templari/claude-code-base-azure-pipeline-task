@@ -12,6 +12,17 @@
   "description": "Run Claude Code AI assistant in Azure DevOps pipelines for automated code analysis, issue triage, and development tasks",
   "categories": ["Azure Pipelines"],
   "tags": ["AI", "Claude", "Code Analysis", "Automation", "CI/CD"],
+  "icons": {
+    "default": "images/extension-icon.png"
+  },
+  "content": {
+    "details": {
+        "path": "overview.md"
+    },
+    "license": {
+        "path": "LICENSE"
+    }
+  },
   "files": [
     {
       "path": "dist",
@@ -36,7 +47,7 @@
   ],
   "repository": {
     "type": "git",
-    "uri": "https://github.com/anthropics/claude-code-base-action"
+    "uri": "https://github.com/claswen/claude-code-base-azure-task"
   },
   "branding": {
     "color": "orange",
