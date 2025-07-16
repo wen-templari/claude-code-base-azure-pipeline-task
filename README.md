@@ -1,5 +1,7 @@
 # Claude Code Base Task for Azure DevOps
 
+> This is still a work in progress. Most of the code was written by claude code and I have only tested the very basic functionalities (Tested using `claude_code_oauth_token` to authenticate and without mcp). Please do not use this extension in production yet.
+
 This Azure DevOps extension allows you to run [Claude Code](https://www.anthropic.com/claude-code) within your Azure DevOps pipelines for automated code analysis, issue triage, and development tasks.
 
 ## Features
